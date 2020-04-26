@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseAccessLayer
+namespace Common
 {
   public enum Unit
   {
