@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Common;
 
 namespace MathLibrary
 {
   public static class Conversions
   {
+    static Unit[] volumeUnits = new Unit[] { Unit.Cups, Unit.Liters, Unit.Millilitres};
+    static Unit[] massAndWeightUnits = new Unit[] { Unit.Grams, Unit.Ounces, Unit.Pounds };
+
     //From Key1 to Key2
     static Dictionary<Tuple<Unit, Unit>, double> _unitConversionDictionary = new Dictionary<Tuple<Unit, Unit>, double> {
-      {Tuple.Create(Unit.Liters, Unit.Millilitres), 0},
-      {Tuple.Create(Unit.Millilitres, Unit.Liters), 0},
+      {Tuple.Create(Unit.Liters, Unit.Millilitres), 1000},
+      {Tuple.Create(Unit.Millilitres, Unit.Liters), 0.001},
 
-      {Tuple.Create(Unit.Liters, Unit.Cups), 0},
-      {Tuple.Create(Unit.Cups, Unit.Liters), 0},
+      {Tuple.Create(Unit.Liters, Unit.Cups), 4.22675},
+      {Tuple.Create(Unit.Cups, Unit.Liters), 0.236588},
 
-      {Tuple.Create(Unit.Cups, Unit.Millilitres), 0},
-      {Tuple.Create(Unit.Millilitres, Unit.Cups), 0},
+      {Tuple.Create(Unit.Cups, Unit.Millilitres), 236.588},
+      {Tuple.Create(Unit.Millilitres, Unit.Cups), 0.00422675},
 
       {Tuple.Create(Unit.Grams, Unit.Ounces), 0.035274},
       {Tuple.Create(Unit.Ounces, Unit.Grams), 28.3495},
@@ -33,14 +37,18 @@ namespace MathLibrary
           ? portion.Serving / servingSize.Serving
           : ConvertPortion(portion, servingSize.ServingUnit) / servingSize.Serving;
 
-      var portionInfo = new NutritionalInfo(Math.Round(servingInfo.Calories * ratio), Math.Round(servingInfo.Protien * ratio));
+      var portionInfo = new NutritionalInfo(servingInfo.Calories * ratio, servingInfo.Protien * ratio);
 
       return portionInfo;
     }
 
     public static double ConvertPortion(ServingInfo portion, Unit servingUnit)
     {
-      //If Volume to Volume or Weight to Weight but if other... do something else
+      if((volumeUnits.Contains(portion.ServingUnit) && massAndWeightUnits.Contains(servingUnit)) ||
+         (volumeUnits.Contains(servingUnit) && massAndWeightUnits.Contains(portion.ServingUnit))) {
+          throw new ArgumentException("Cannot convert between Volume and Mass/Weight without a supplied density, which is not currently a feature");
+      }
+
       var ratio = _unitConversionDictionary[Tuple.Create(portion.ServingUnit, servingUnit)];
       return ratio * portion.Serving;
     }

@@ -11,6 +11,6 @@ namespace Common
     Pounds,
     Liters,
     Millilitres,
-    Cups
+    Cups,
   }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Common;
 
 namespace BusinessLayer
 {
@@ -11,7 +12,7 @@ namespace BusinessLayer
     public CalorieLog(DatabaseContext context) {
       _context = context;
     }
-    public void AddFoodEntry(int foodId, Serving serving) { 
+    public void AddFoodEntry(int foodId, ServingInfo portion) { 
       //Get food
       //Math.convert(fromServingSize, fromUnit, toServingSize, toUnit, calories, protien)
       //make new class for size and unit together -> Serving
