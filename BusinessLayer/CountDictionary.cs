@@ -62,14 +62,14 @@ namespace BusinessLayer
       _context.SavedMeals.Remove(existingMeal);
       _context.SaveChanges();
     }
-    private SavedMeal getMeal(int mealId) {
+    public SavedMeal getMeal(int mealId) {
       var existingMeal = _context.SavedMeals.SingleOrDefault(o => o.Id == mealId);
       if(existingMeal == null) {
         throw new ArgumentException(string.Format("No Meal With Id {0} exists", mealId));
       }
       return existingMeal;
     }
-    private SavedFood getFood(int foodId) {
+    public SavedFood getFood(int foodId) {
       var existingFood = _context.SavedFoods.SingleOrDefault(o => o.Id == foodId);
       if(existingFood == null) {
         throw new ArgumentException(string.Format("No Food With Id {0} exists", foodId));

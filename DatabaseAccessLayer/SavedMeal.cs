@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,5 +11,9 @@ namespace DatabaseAccessLayer
     public string MealName { get; set; }
     public int Calories { get; set; }
     public int Protien { get; set; }
+
+    public NutritionalInfo GetNutritionalInfo() {
+      return new NutritionalInfo(Calories, Protien);
+    }
   }
 }

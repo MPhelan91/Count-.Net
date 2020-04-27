@@ -3,25 +3,29 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Common;
+using MathLibrary;
 
 namespace BusinessLayer
 {
   public class CalorieLog
   {
     private DatabaseContext _context;
+    private CountDictionary _countDictionary;
     public CalorieLog(DatabaseContext context) {
       _context = context;
+      _countDictionary = new CountDictionary(context);
+
     }
-    public void AddFoodEntry(int foodId, ServingInfo portion) { 
-      //Get food
-      //Math.convert(fromServingSize, fromUnit, toServingSize, toUnit, calories, protien)
-      //make new class for size and unit together -> Serving
-      // make new class for protien and calories together -> nutritional data
+    public NutritionalInfo CalculateNutritional(int foodId, ServingInfo portion) {
+      var food = _countDictionary.getFood(foodId);
+      return Conversions.Convert(food.GetServingInfo(), food.GetNutritionalInfo(), portion);
     }
-    public void AddCustomEntry(int calories, int protien) { }
-    public void RemoveFoodEntry(int id) { }
+
+    public void AddFoodEntry() { }
+    public void AddManualEntry(int calories, int protien) { }
+    public void RemoveFoodEntry(int foodId) { }
     public void AddMealEntry(int mealId) { }
-    public void RemoveMealEntry() { }
+    public void RemoveMealEntry(int mealId) { }
 
     public void GetTodaysCount() { }
   }

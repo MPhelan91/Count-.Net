@@ -13,5 +13,11 @@ namespace DatabaseAccessLayer
     public Unit ServingUnit { get; set; }
     public int Calories { get; set; }
     public int Protien { get; set; }
+    public ServingInfo GetServingInfo() {
+      return new ServingInfo(ServingSize, ServingUnit); 
+    }
+    public NutritionalInfo GetNutritionalInfo() {
+      return new NutritionalInfo(Calories, Protien);
+    }
   }
 }

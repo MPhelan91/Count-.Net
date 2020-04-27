@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\DatabaseAccessLayer\DatabaseAccessLayer.csproj" />
+    <ProjectReference Include="..\MathLibrary\MathLibrary.csproj" />
   </ItemGroup>
 
 </Project>
