@@ -9,8 +9,8 @@ namespace DatabaseAccessLayer
     public int Id { get; set; }
     public DateTime EntryDate { get; set; }
     public SavedFood FoodForEntry { get; set; }
-    public int Calories { get; set; }
-    public int Protien { get; set; }
+    public double Calories { get; set; }
+    public double Protien { get; set; }
   }
 
   public class MealEntry
