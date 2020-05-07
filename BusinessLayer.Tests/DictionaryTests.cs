@@ -15,20 +15,6 @@ namespace BusinessLayer.Tests
     CountDictionary sut;
     DatabaseContext inMemoryDb;
 
-    private DatabaseContext createInMemoryDatabase(string name, ICollection<SavedFood> foods, ICollection<SavedMeal> meals) {
-      //Create in memory db
-      var options = new DbContextOptionsBuilder<DatabaseContext>()
-          .UseInMemoryDatabase(databaseName: name)
-          .Options;
-      var inMemoryDb = new DatabaseContext(options);
-
-      //Add demo data
-      inMemoryDb.SavedFoods.AddRange(foods);
-      inMemoryDb.SavedMeals.AddRange(meals);
-      inMemoryDb.SaveChanges();
-      return inMemoryDb;
-    }
-
     [OneTimeSetUp]
     public void Setup()
     {
@@ -39,7 +25,7 @@ namespace BusinessLayer.Tests
         new SavedMeal { MealName = "ExistingMeal", Calories = 100, Protien = 5},
       };
 
-      inMemoryDb = createInMemoryDatabase("Test Database", foods, meals);
+      inMemoryDb = Common.CreateInMemoryDatabase("Test Database", foods, meals);
       sut = new CountDictionary(inMemoryDb);
     }
 
@@ -55,7 +41,7 @@ namespace BusinessLayer.Tests
         new SavedMeal { MealName = "ExistingMeal2", Calories = 100, Protien = 5},
       };
 
-      var testDb = createInMemoryDatabase("Constructor Test", foods, meals);
+      var testDb = Common.CreateInMemoryDatabase("Constructor Test", foods, meals);
 
       var sutForConstrutcorTest = new CountDictionary(testDb);
 

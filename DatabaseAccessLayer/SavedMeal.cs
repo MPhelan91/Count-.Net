@@ -9,8 +9,8 @@ namespace DatabaseAccessLayer
   {
     public int Id { get; set; }
     public string MealName { get; set; }
-    public int Calories { get; set; }
-    public int Protien { get; set; }
+    public double Calories { get; set; }
+    public double Protien { get; set; }
 
     public NutritionalInfo GetNutritionalInfo() {
       return new NutritionalInfo(Calories, Protien);

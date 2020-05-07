@@ -7,6 +7,7 @@ using MathLibrary;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq.Expressions;
 
 namespace BusinessLayer
 {
@@ -52,7 +53,7 @@ namespace BusinessLayer
     public void RemoveFoodEntry(int foodEntryId) { 
       var existingEntry = _context.FoodEntries.SingleOrDefault(o => o.Id == foodEntryId);
       if(existingEntry == null) {
-        throw new ArgumentException(string.Format("No FoodEntry exists with id {0}", foodEntryId);
+        throw new ArgumentException(string.Format("No FoodEntry exists with id {0}", foodEntryId));
       }
       _context.FoodEntries.Remove(existingEntry);
       _context.SaveChanges();
@@ -60,17 +61,40 @@ namespace BusinessLayer
     public void RemoveMealEntry(int mealEntryId) {
       var existingEntry = _context.MealEntries.SingleOrDefault(o => o.Id == mealEntryId);
       if(existingEntry == null) {
-        throw new ArgumentException(string.Format("No MealEntry exists with id {0}", mealEntryId);
+        throw new ArgumentException(string.Format("No MealEntry exists with id {0}", mealEntryId));
       }
       _context.MealEntries.Remove(existingEntry);
       _context.SaveChanges();
     }
 
-    /*Think about total vs calories per entry matching up and rounding*/
+    public NutritionalInfo GetCurrentCount() {
+      var today = DateTime.Today;
+      var tomorrow = DateTime.Today + TimeSpan.FromDays(1);
 
-    public int GetCurrentCount() {
-      //Linq query to sum calories
-      return 0;
+      var foodQuery = from entry in _context.FoodEntries
+                      where entry.EntryDate >= today
+                      where entry.EntryDate < tomorrow
+                      group entry by 1 into g
+                      select new {
+                        Calories = g.Sum(o => o.Calories),
+                        Protien = g.Sum(o => o.Protien)
+                      };
+
+      var mealQuery = from entry in _context.MealEntries
+                      where entry.EntryDate >= today
+                      where entry.EntryDate < tomorrow
+                      join meal in _context.SavedMeals on entry.MealForEntry equals meal 
+                      group meal by 1 into g
+                      select new {
+                        Calories = g.Sum(o => o.Calories),
+                        Protien = g.Sum(o => o.Protien)
+                      };
+
+      var finalQuery = from f in foodQuery.Union(mealQuery)
+                       group f by 1 into g
+                       select new NutritionalInfo(g.Sum(o => o.Calories), g.Sum(o => o.Protien));
+
+      return finalQuery.First();
     }
 
     public IList<CalorieEntry> GetCurrentEntries() {
