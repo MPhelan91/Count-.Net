@@ -15,9 +15,17 @@ namespace BusinessLayer
   {
     private DatabaseContext _context;
     private CountDictionary _countDictionary;
-    public CalorieLog(DatabaseContext context) {
+    private DateTime _startDate;
+    private DateTime _endDate;
+    public CalorieLog(DatabaseContext context, DateTime? startDate = null, DateTime? endDate = null) {
       _context = context;
       _countDictionary = new CountDictionary(context);
+      _startDate = startDate ?? DateTime.Today;
+      _endDate = endDate ?? DateTime.Today + TimeSpan.FromDays(1);
+
+      if(startDate >= _endDate) {
+        throw new ArgumentException("The calorie log's start date must be before the end date");
+      }
 
     }
     public NutritionalInfo CalculateNutritional(int foodId, ServingInfo portion) {
@@ -34,19 +42,19 @@ namespace BusinessLayer
     public void AddFoodEntry(int foodId, NutritionalInfo info) {
       validateEntry(info);
       var food = _countDictionary.getFood(foodId);
-      var newEntry = new FoodEntry { FoodForEntry = food, Calories = info.Calories, Protien = info.Protien, EntryDate = DateTime.Today };
+      var newEntry = new FoodEntry { FoodForEntry = food, Calories = info.Calories, Protien = info.Protien, EntryDate = DateTime.Now };
       _context.FoodEntries.Add(newEntry);
       _context.SaveChanges();
     }
     public void AddManualEntry(NutritionalInfo info) { 
       validateEntry(info);
-      var newEntry = new FoodEntry { Calories = info.Calories, Protien = info.Protien, EntryDate = DateTime.Today  };
+      var newEntry = new FoodEntry { Calories = info.Calories, Protien = info.Protien, EntryDate = DateTime.Now  };
       _context.FoodEntries.Add(newEntry);
       _context.SaveChanges();
     }
     public void AddMealEntry(int mealId) { 
       var meal = _countDictionary.getMeal(mealId);
-      var newEntry = new MealEntry { MealForEntry=meal, EntryDate = DateTime.Today };
+      var newEntry = new MealEntry { MealForEntry=meal, EntryDate = DateTime.Now };
       _context.MealEntries.Add(newEntry);
       _context.SaveChanges();
     }
@@ -68,12 +76,9 @@ namespace BusinessLayer
     }
 
     public NutritionalInfo GetCurrentCount() {
-      var today = DateTime.Today;
-      var tomorrow = DateTime.Today + TimeSpan.FromDays(1);
-
       var foodQuery = from entry in _context.FoodEntries
-                      where entry.EntryDate >= today
-                      where entry.EntryDate < tomorrow
+                      where entry.EntryDate >= _startDate
+                      where entry.EntryDate < _endDate
                       group entry by 1 into g
                       select new {
                         Calories = g.Sum(o => o.Calories),
@@ -81,8 +86,8 @@ namespace BusinessLayer
                       };
 
       var mealQuery = from entry in _context.MealEntries
-                      where entry.EntryDate >= today
-                      where entry.EntryDate < tomorrow
+                      where entry.EntryDate >= _startDate
+                      where entry.EntryDate < _endDate
                       join meal in _context.SavedMeals on entry.MealForEntry equals meal 
                       group meal by 1 into g
                       select new {
@@ -97,9 +102,32 @@ namespace BusinessLayer
       return finalQuery.First();
     }
 
-    public IList<CalorieEntry> GetCurrentEntries() {
+    public CalorieEntry[] GetCurrentEntries() {
       //Linq quey to get entries
-      return new List<CalorieEntry>();
+      var foodQuery = from entry in _context.FoodEntries
+                      where entry.EntryDate >= _startDate
+                      where entry.EntryDate < _endDate
+                      join food in _context.SavedFoods on entry.FoodForEntry equals food into entryXfood
+                      from food in entryXfood.DefaultIfEmpty()
+                      select new CalorieEntry {
+                        Name =  food != null ? food.FoodName : "Manual Entry",
+                        Calories = entry.Calories,
+                        Protien = entry.Protien,
+                        EntryDate = entry.EntryDate
+                      };
+
+      var mealQuery = from entry in _context.MealEntries
+                      where entry.EntryDate >= _startDate
+                      where entry.EntryDate < _endDate
+                      join meal in _context.SavedMeals on entry.MealForEntry equals meal
+                      select new CalorieEntry{
+                        Name = meal.MealName,
+                        Calories = meal.Calories,
+                        Protien =  meal.Protien,
+                        EntryDate = entry.EntryDate
+                      };
+
+      return foodQuery.Union(mealQuery).OrderByDescending(o => o.EntryDate).ToArray();
     }
   }
 }
