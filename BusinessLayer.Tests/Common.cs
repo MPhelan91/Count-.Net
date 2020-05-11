@@ -15,6 +15,9 @@ namespace BusinessLayer.Tests
           .Options;
       var inMemoryDb = new DatabaseContext(options);
 
+      //Clear Any Data already existsing
+      inMemoryDb.Database.EnsureDeleted();
+
       //Add demo data
       if(foods != null) inMemoryDb.SavedFoods.AddRange(foods);
       if(meals != null) inMemoryDb.SavedMeals.AddRange(meals);

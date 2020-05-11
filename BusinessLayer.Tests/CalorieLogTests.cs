@@ -1,6 +1,7 @@
 ﻿using Common;
 using DatabaseAccessLayer;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +13,19 @@ namespace BusinessLayer.Tests
   public class CalorieLogTests {
     CalorieLog sut;
     DatabaseContext inMemoryDb;
+    SavedFood[] foods;
+    SavedMeal[] meals;
+    FoodEntry[] foodEntries;
+    MealEntry[] mealEntries;
 
-    [OneTimeSetUp]
+    [SetUp]
     public void Setup()
     {
-      var foods = new List<SavedFood>() {
+      foods = new SavedFood[] {
         new SavedFood { FoodName = "Chicken Breast", Calories = 110, Protien = 26, ServingSize = 4, ServingUnit = Unit.Ounces},
       };
 
-      var foodEntries = new List<FoodEntry> { 
+      foodEntries = new FoodEntry[] { 
         new FoodEntry {FoodForEntry=foods[0], Calories = 100, Protien = 2, EntryDate = DateTime.Today},
         new FoodEntry {Calories = 200.1, Protien = 1, EntryDate = DateTime.Now},
         new FoodEntry {Calories = 100.91, Protien = 3, EntryDate = DateTime.Now},
@@ -29,13 +34,13 @@ namespace BusinessLayer.Tests
         new FoodEntry {Calories = 3000, Protien = 300, EntryDate = DateTime.Today - TimeSpan.FromDays(2)},
       };
 
-      var meals = new List<SavedMeal>() {
+      meals = new SavedMeal[] {
         new SavedMeal { MealName = "Chipotle", Calories = 770, Protien = 4},
         new SavedMeal { MealName = "Cliff Bar", Calories = 280, Protien = 5},
         new SavedMeal { MealName = "Fuel Wrap", Calories = 650, Protien = 6},
       };
 
-      var mealEntries = new List<MealEntry>() {
+      mealEntries = new MealEntry[] {
         new MealEntry {MealForEntry = meals[1], EntryDate = DateTime.Today + TimeSpan.FromDays(1)},
         new MealEntry {MealForEntry = meals[0], EntryDate = DateTime.Today},
         new MealEntry {MealForEntry = meals[1], EntryDate = DateTime.Now},
@@ -44,7 +49,7 @@ namespace BusinessLayer.Tests
         new MealEntry {MealForEntry = meals[2], EntryDate = DateTime.Today - TimeSpan.FromDays(3)},
       };
 
-      inMemoryDb = Common.CreateInMemoryDatabase("Test Database",foods:foods, meals: meals, mealEntries: mealEntries, foodEntries: foodEntries);
+      inMemoryDb = Common.CreateInMemoryDatabase("Calorie Log Database",foods:foods, meals: meals, mealEntries: mealEntries, foodEntries: foodEntries);
       sut = new CalorieLog(inMemoryDb);
     }
 
@@ -88,5 +93,43 @@ namespace BusinessLayer.Tests
       Assert.AreEqual(2101.01, currentCounts.Calories);
     }
 
+    [Test]
+    public void AddEntries_Succesful()
+    {
+      sut.AddFoodEntry(foods[0].Id, new NutritionalInfo(3, 3));
+      sut.AddMealEntry(meals[0].Id);
+      sut.AddManualEntry(new NutritionalInfo(3, 3));
+
+      var currentEntries = sut.GetCurrentEntries();
+      Assert.IsTrue(currentEntries.Any(o => o.Name.Equals("Manual Entry") && o.Calories == 3 && o.Protien == 3));
+      Assert.IsTrue(currentEntries.Any(o => o.Name.Equals("Chicken Breast") && o.Calories == 3 && o.Protien == 3));
+      Assert.AreEqual(currentEntries.Count(o => o.Name.Equals("Chipotle") && o.Calories == 770 && o.Protien == 4), 2);
+    }
+
+
+    [Test]
+    public void AddRemoveEntries_Successful()
+    {
+      foreach (var f in foodEntries)
+      {
+        sut.RemoveFoodEntry(f.Id);
+      }
+      foreach (var m in mealEntries)
+      {
+        sut.RemoveMealEntry(m.Id);
+      }
+      var currentEntries = sut.GetCurrentEntries();
+      CollectionAssert.IsEmpty(currentEntries);
+    }
+
+    [Test]
+    public void Validate_Throws_Exception() {
+      Assert.Throws<ArgumentException>(() => sut.ValidateEntry(new NutritionalInfo(0,0)), "Calorie for entry must be greater than 0");
+    }
+    [Test]
+    public void Remove_Fails_With_Invalid_Ids() {
+      Assert.Throws<ArgumentException>(() => sut.RemoveFoodEntry(1234), "No FoodEntry exists with id 1234");
+      Assert.Throws<ArgumentException>(() => sut.RemoveMealEntry(1234), "No MealEntry exists with id 1234");
+    }
   }
 }

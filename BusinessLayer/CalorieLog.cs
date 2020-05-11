@@ -33,21 +33,21 @@ namespace BusinessLayer
       return Conversions.Convert(food.GetServingInfo(), food.GetNutritionalInfo(), portion);
     }
 
-    private void validateEntry(NutritionalInfo info) {
+    public void ValidateEntry(NutritionalInfo info) {
       if(info.Calories == 0) {
         throw new ArgumentException("Calorie for entry must be greater than 0");
       }
     }
 
     public void AddFoodEntry(int foodId, NutritionalInfo info) {
-      validateEntry(info);
+      ValidateEntry(info);
       var food = _countDictionary.getFood(foodId);
       var newEntry = new FoodEntry { FoodForEntry = food, Calories = info.Calories, Protien = info.Protien, EntryDate = DateTime.Now };
       _context.FoodEntries.Add(newEntry);
       _context.SaveChanges();
     }
     public void AddManualEntry(NutritionalInfo info) { 
-      validateEntry(info);
+      ValidateEntry(info);
       var newEntry = new FoodEntry { Calories = info.Calories, Protien = info.Protien, EntryDate = DateTime.Now  };
       _context.FoodEntries.Add(newEntry);
       _context.SaveChanges();
@@ -74,6 +74,7 @@ namespace BusinessLayer
       _context.MealEntries.Remove(existingEntry);
       _context.SaveChanges();
     }
+
 
     public NutritionalInfo GetCurrentCount() {
       var foodQuery = from entry in _context.FoodEntries
@@ -103,7 +104,6 @@ namespace BusinessLayer
     }
 
     public CalorieEntry[] GetCurrentEntries() {
-      //Linq quey to get entries
       var foodQuery = from entry in _context.FoodEntries
                       where entry.EntryDate >= _startDate
                       where entry.EntryDate < _endDate
