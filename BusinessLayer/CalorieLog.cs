@@ -75,7 +75,6 @@ namespace BusinessLayer
       _context.SaveChanges();
     }
 
-
     public NutritionalInfo GetCurrentCount() {
       var foodQuery = from entry in _context.FoodEntries
                       where entry.EntryDate >= _startDate
@@ -100,7 +99,7 @@ namespace BusinessLayer
                        group f by 1 into g
                        select new NutritionalInfo(g.Sum(o => o.Calories), g.Sum(o => o.Protien));
 
-      return finalQuery.First();
+      return finalQuery.FirstOrDefault() ?? new NutritionalInfo(0,0);
     }
 
     public CalorieEntry[] GetCurrentEntries() {

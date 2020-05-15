@@ -60,6 +60,20 @@ namespace BusinessLayer.Tests
             return x.Name.CompareTo(y.Name) + x.Calories.CompareTo(y.Calories) + x.Protien.CompareTo(y.Protien);
         }
     }
+    [Test]
+    public void GetCurrentOnEmptyDatabase()
+    { 
+      var testDb = Common.CreateInMemoryDatabase("Empty DB Test");
+
+      var sutForEmptyDbTest = new CalorieLog(testDb);
+
+      var info = sutForEmptyDbTest.GetCurrentCount();
+      var entries = sutForEmptyDbTest.GetCurrentEntries();
+
+      Assert.IsTrue(entries.Length == 0);
+      Assert.AreEqual(0, info.Calories);
+      Assert.AreEqual(0, info.Protien);
+    }
 
     [Test]
     public void GetCurrentEntries() {
