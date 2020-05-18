@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using BusinessLayer;
 using Common;
+using CountApi.Messages;
 using DatabaseAccessLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CountApi.Controllers
 {
@@ -35,11 +37,18 @@ namespace CountApi.Controllers
       return _log.GetCurrentCount(); 
     }
 
+    [Route("calcNutritionalInfo")]
+    [HttpGet]
+    public NutritionalInfo CalculateNutritionalInfo([FromBody] CalcMessage message)
+    {
+      return _log.CalculateNutritionalInfo(message.FoodId, message.Serving); 
+    }
+
     [Route("addFoodEntry")]
     [HttpPost]
-    public IActionResult PostFoodEntry([FromBody] int foodId, [FromBody] NutritionalInfo info)
+    public IActionResult PostFoodEntry([FromBody] FoodPosting newEntry)
     {
-      return tryCatchServiceCall(() => _log.AddFoodEntry(foodId, info)); 
+      return tryCatchServiceCall(() => _log.AddFoodEntry(newEntry.FoodId, newEntry.Info)); 
     }
 
     [Route("addManualEntry")]
@@ -49,7 +58,7 @@ namespace CountApi.Controllers
       return tryCatchServiceCall(() => _log.AddManualEntry(info)); 
     }
 
-    [Route("addManualEntry")]
+    [Route("addMealEntry")]
     [HttpPost]
     public IActionResult PostMealEntry([FromBody] int mealId)
     {

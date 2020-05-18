@@ -28,7 +28,7 @@ namespace BusinessLayer
       }
 
     }
-    public NutritionalInfo CalculateNutritional(int foodId, ServingInfo portion) {
+    public NutritionalInfo CalculateNutritionalInfo(int foodId, ServingInfo portion) {
       var food = _countDictionary.getFood(foodId);
       return Conversions.Convert(food.GetServingInfo(), food.GetNutritionalInfo(), portion);
     }

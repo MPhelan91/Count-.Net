@@ -6,6 +6,7 @@ namespace Common
 {
   public class NutritionalInfo
   {
+    public NutritionalInfo() { }
     public NutritionalInfo(double cal, double protien) {
       Calories = cal;
       Protien = protien;
