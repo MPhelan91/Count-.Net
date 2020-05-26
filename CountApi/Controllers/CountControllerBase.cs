@@ -18,5 +18,14 @@ namespace CountApi.Controllers
         return Ok(new ResponseMessage { Status = "failure", FailureMessage = ex.Message });
       }
     }
+    protected IActionResult tryCatchServiceCallReturnResult<T>(Func<T> serviceCall) {
+      try {
+        var result = serviceCall.Invoke();
+        return Ok(result);
+      }
+      catch(Exception ex) {
+        return Ok(new ResponseMessage { Status = "failure", FailureMessage = ex.Message });
+      }
+    }
   }
 }

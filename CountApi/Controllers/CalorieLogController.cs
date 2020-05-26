@@ -38,10 +38,10 @@ namespace CountApi.Controllers
     }
 
     [Route("calcNutritionalInfo")]
-    [HttpGet]
-    public NutritionalInfo CalculateNutritionalInfo([FromBody] CalcMessage message)
+    [HttpPut]
+    public IActionResult CalculateNutritionalInfo([FromBody] CalcMessage message)
     {
-      return _log.CalculateNutritionalInfo(message.FoodId, message.Serving); 
+      return tryCatchServiceCallReturnResult<NutritionalInfo>(() => _log.CalculateNutritionalInfo(message.FoodId, message.Serving)); 
     }
 
     [Route("addFoodEntry")]
@@ -60,23 +60,23 @@ namespace CountApi.Controllers
 
     [Route("addMealEntry")]
     [HttpPost]
-    public IActionResult PostMealEntry([FromBody] int mealId)
+    public IActionResult PostMealEntry([FromBody] MealPosting newEntry)
     {
-      return tryCatchServiceCall(() => _log.AddMealEntry(mealId)); 
+      return tryCatchServiceCall(() => _log.AddMealEntry(newEntry.MealId)); 
     }
 
-    [Route("deleteFoodOrManualEntry")]
-    [HttpDelete("{id}")]
+    [Route("deleteFoodOrManualEntry/{id}")]
+    [HttpDelete]
     public IActionResult DeleteFoodOrManualEntry(int id)
     {
       return tryCatchServiceCall(() => _log.RemoveFoodEntry(id)); 
     }
 
-    [Route("deleteMealEntry")]
-    [HttpDelete("{id}")]
+    [Route("deleteMealEntry/{id}")]
+    [HttpDelete]
     public IActionResult DeleteMealEntry(int id)
     {
-      return tryCatchServiceCall(() => _log.RemoveFoodEntry(id)); 
+      return tryCatchServiceCall(() => _log.RemoveMealEntry(id)); 
     }
   }
 }

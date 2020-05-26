@@ -109,6 +109,8 @@ namespace BusinessLayer
                       join food in _context.SavedFoods on entry.FoodForEntry equals food into entryXfood
                       from food in entryXfood.DefaultIfEmpty()
                       select new CalorieEntry {
+                        Id = entry.Id,
+                        Type =  food != null ? EntryType.Food : EntryType.Manual,
                         Name =  food != null ? food.FoodName : "Manual Entry",
                         Calories = entry.Calories,
                         Protien = entry.Protien,
@@ -120,6 +122,8 @@ namespace BusinessLayer
                       where entry.EntryDate < _endDate
                       join meal in _context.SavedMeals on entry.MealForEntry equals meal
                       select new CalorieEntry{
+                        Id = entry.Id,
+                        Type = EntryType.Meal,
                         Name = meal.MealName,
                         Calories = meal.Calories,
                         Protien =  meal.Protien,
