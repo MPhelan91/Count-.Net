@@ -23,18 +23,18 @@ namespace CountApi.Controllers
       _log = new CalorieLog(dbContext);
     }
 
-    [Route("getEntries")]
+    [Route("getEntries/{date}")]
     [HttpGet]
-    public IEnumerable<CalorieEntry> GetEntries()
+    public IEnumerable<CalorieEntry> GetEntries(DateTime date)
     {
-      return _log.GetCurrentEntries();
+      return _log.GetEntries(date);
     }
 
-    [Route("getCounts")]
+    [Route("getCounts/{date}")]
     [HttpGet]
-    public NutritionalInfo GetCounts()
+    public NutritionalInfo GetCounts(DateTime date)
     {
-      return _log.GetCurrentCount(); 
+      return _log.GetCount(date); 
     }
 
     [Route("calcNutritionalInfo")]

@@ -67,8 +67,8 @@ namespace BusinessLayer.Tests
 
       var sutForEmptyDbTest = new CalorieLog(testDb);
 
-      var info = sutForEmptyDbTest.GetCurrentCount();
-      var entries = sutForEmptyDbTest.GetCurrentEntries();
+      var info = sutForEmptyDbTest.GetCount(DateTime.Today);
+      var entries = sutForEmptyDbTest.GetEntries(DateTime.Today);
 
       Assert.IsTrue(entries.Length == 0);
       Assert.AreEqual(0, info.Calories);
@@ -76,8 +76,29 @@ namespace BusinessLayer.Tests
     }
 
     [Test]
+    public void GetYesterdaysEntries() {
+      var currentEntries = sut.GetEntries(DateTime.Today - TimeSpan.FromDays(1));
+
+      var expectedEntries = new CalorieEntry[] {
+        new CalorieEntry{Name="Manual Entry", Calories=2000, Protien=800},
+        new CalorieEntry{Name="Cliff Bar", Calories=280, Protien=5},
+      };
+
+      Assert.That(currentEntries, Is.EquivalentTo(expectedEntries).Using<CalorieEntry>(new EntryComparer()));
+      Assert.That(currentEntries, Is.Ordered.Descending.By("EntryDate"));
+    }
+
+    [Test]
+    public void GetYesterdaysCounts() {
+      var currentCounts = sut.GetCount(DateTime.Today - TimeSpan.FromDays(1));
+
+      Assert.AreEqual(805, currentCounts.Protien);
+      Assert.AreEqual(2280, currentCounts.Calories);
+    }
+
+    [Test]
     public void GetCurrentEntries() {
-      var currentEntries = sut.GetCurrentEntries();
+      var currentEntries = sut.GetEntries(DateTime.Today);
 
       var expectedEntries = new CalorieEntry[] {
         new CalorieEntry{Name="Chicken Breast", Calories=100, Protien=2},
@@ -91,17 +112,10 @@ namespace BusinessLayer.Tests
       Assert.That(currentEntries, Is.EquivalentTo(expectedEntries).Using<CalorieEntry>(new EntryComparer()));
       Assert.That(currentEntries, Is.Ordered.Descending.By("EntryDate"));
     }
-    [Test]
-    public void Constructor_Fails_With_Invalid_Dates() {
-      var badStartDate = DateTime.Today + TimeSpan.FromDays(1);
-      var badEndDate = DateTime.Today;
-
-      Assert.Throws<ArgumentException>(() => new CalorieLog(inMemoryDb, badStartDate, badEndDate), "The calorie log's start date must be before the end date");
-    }
 
     [Test]
     public void GetCurrentCounts() {
-      var currentCounts = sut.GetCurrentCount();
+      var currentCounts = sut.GetCount(DateTime.Today);
 
       Assert.AreEqual(21, currentCounts.Protien);
       Assert.AreEqual(2101.01, currentCounts.Calories);
@@ -114,7 +128,7 @@ namespace BusinessLayer.Tests
       sut.AddMealEntry(meals[0].Id);
       sut.AddManualEntry(new NutritionalInfo(3, 3));
 
-      var currentEntries = sut.GetCurrentEntries();
+      var currentEntries = sut.GetEntries(DateTime.Today);
       Assert.IsTrue(currentEntries.Any(o => o.Name.Equals("Manual Entry") && o.Calories == 3 && o.Protien == 3));
       Assert.IsTrue(currentEntries.Any(o => o.Name.Equals("Chicken Breast") && o.Calories == 3 && o.Protien == 3));
       Assert.AreEqual(currentEntries.Count(o => o.Name.Equals("Chipotle") && o.Calories == 770 && o.Protien == 4), 2);
@@ -132,7 +146,7 @@ namespace BusinessLayer.Tests
       {
         sut.RemoveMealEntry(m.Id);
       }
-      var currentEntries = sut.GetCurrentEntries();
+      var currentEntries = sut.GetEntries(DateTime.Today);
       CollectionAssert.IsEmpty(currentEntries);
     }
 
