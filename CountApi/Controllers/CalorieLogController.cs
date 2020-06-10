@@ -44,6 +44,20 @@ namespace CountApi.Controllers
       return tryCatchServiceCallReturnResult<NutritionalInfo>(() => _log.CalculateNutritionalInfo(message.FoodId, message.Serving)); 
     }
 
+    [Route("copyFoodEntry/{id}")]
+    [HttpPost]
+    public IActionResult PostFoodEntry(int id)
+    {
+      return tryCatchServiceCall(() => _log.CopyFoodEntryToToday(id)); 
+    }
+
+    [Route("copyMealEntry/{id}")]
+    [HttpPost]
+    public IActionResult PostMealEntry(int id)
+    {
+      return tryCatchServiceCall(() => _log.CopyMealEntryToToday(id)); 
+    }
+
     [Route("addFoodEntry")]
     [HttpPost]
     public IActionResult PostFoodEntry([FromBody] FoodPosting newEntry)

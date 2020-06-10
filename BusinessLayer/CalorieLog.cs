@@ -8,6 +8,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Linq.Expressions;
+using System.Dynamic;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer
 {
@@ -49,20 +51,50 @@ namespace BusinessLayer
       _context.MealEntries.Add(newEntry);
       _context.SaveChanges();
     }
-    public void RemoveFoodEntry(int foodEntryId) { 
-      var existingEntry = _context.FoodEntries.SingleOrDefault(o => o.Id == foodEntryId);
-      if(existingEntry == null) {
-        throw new ArgumentException(string.Format("No FoodEntry exists with id {0}", foodEntryId));
-      }
+    public void RemoveFoodEntry(int foodEntryId) {
+      var existingEntry = getFoodEntry(foodEntryId);
       _context.FoodEntries.Remove(existingEntry);
       _context.SaveChanges();
     }
     public void RemoveMealEntry(int mealEntryId) {
-      var existingEntry = _context.MealEntries.SingleOrDefault(o => o.Id == mealEntryId);
-      if(existingEntry == null) {
-        throw new ArgumentException(string.Format("No MealEntry exists with id {0}", mealEntryId));
-      }
+      var existingEntry = getMealEntry(mealEntryId);
       _context.MealEntries.Remove(existingEntry);
+      _context.SaveChanges();
+    }
+
+    private FoodEntry getFoodEntry(int entryId) {
+      var existingEntry = _context.FoodEntries.Include(o=> o.FoodForEntry).SingleOrDefault(o => o.Id == entryId);
+      if(existingEntry == null) {
+        throw new ArgumentException(string.Format("No FoodEntry exists with id {0}", entryId));
+      }
+      return existingEntry;
+    }
+    private MealEntry getMealEntry(int entryId) {
+      var existingEntry = _context.MealEntries.Include(o => o.MealForEntry).SingleOrDefault(o => o.Id == entryId);
+      if(existingEntry == null) {
+        throw new ArgumentException(string.Format("No MealEntry exists with id {0}", entryId));
+      }
+      return existingEntry;
+    }
+
+    public void CopyFoodEntryToToday(int entryId) {
+      var existingEntry = getFoodEntry(entryId);
+      var newEntry = new FoodEntry {
+        Calories = existingEntry.Calories,
+        Protien = existingEntry.Protien,
+        FoodForEntry = existingEntry.FoodForEntry,
+        EntryDate = DateTime.Now
+      };
+      _context.FoodEntries.Add(newEntry);
+      _context.SaveChanges();
+    }
+    public void CopyMealEntryToToday(int entryId) {
+      var existingEntry = getMealEntry(entryId);
+      var newEntry = new MealEntry {
+        MealForEntry = existingEntry.MealForEntry,
+        EntryDate = DateTime.Now
+      };
+      _context.MealEntries.Add(newEntry);
       _context.SaveChanges();
     }
 
