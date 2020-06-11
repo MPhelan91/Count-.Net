@@ -15,8 +15,7 @@ namespace BusinessLayer.Tests
     DatabaseContext inMemoryDb;
     SavedFood[] foods;
     SavedMeal[] meals;
-    FoodEntry[] foodEntries;
-    MealEntry[] mealEntries;
+    CalorieEntry[] calorieEntries;
 
     [SetUp]
     public void Setup()
@@ -25,13 +24,19 @@ namespace BusinessLayer.Tests
         new SavedFood { FoodName = "Chicken Breast", Calories = 110, Protien = 26, ServingSize = 4, ServingUnit = Unit.Ounces},
       };
 
-      foodEntries = new FoodEntry[] { 
-        new FoodEntry {FoodForEntry=foods[0], Calories = 100, Protien = 2, EntryDate = DateTime.Today},
-        new FoodEntry {Calories = 200.1, Protien = 1, EntryDate = DateTime.Now},
-        new FoodEntry {Calories = 100.91, Protien = 3, EntryDate = DateTime.Now},
-        new FoodEntry {Calories = 1000.80, Protien = 500.42, EntryDate = DateTime.Today + TimeSpan.FromDays(1)},
-        new FoodEntry {Calories = 2000, Protien = 800, EntryDate = DateTime.Today - TimeSpan.FromDays(1)},
-        new FoodEntry {Calories = 3000, Protien = 300, EntryDate = DateTime.Today - TimeSpan.FromDays(2)},
+      calorieEntries = new CalorieEntry[] { 
+        new CalorieEntry {Name= "Chicken Breast", Calories = 100, Protien = 2, EntryDate = DateTime.Today},
+        new CalorieEntry {Name ="Manual Entry", Calories = 200.1, Protien = 1, EntryDate = DateTime.Now},
+        new CalorieEntry {Name ="Manual Entry", Calories = 100.91, Protien = 3, EntryDate = DateTime.Now},
+        new CalorieEntry {Name ="Manual Entry", Calories = 1000.80, Protien = 500.42, EntryDate = DateTime.Today + TimeSpan.FromDays(1)},
+        new CalorieEntry {Name ="Manual Entry", Calories = 2000, Protien = 800, EntryDate = DateTime.Today - TimeSpan.FromDays(1)},
+        new CalorieEntry {Name ="Manual Entry", Calories = 3000, Protien = 300, EntryDate = DateTime.Today - TimeSpan.FromDays(2)},
+        new CalorieEntry {Name = "Cliff Bar", Calories = 280, Protien = 5,  EntryDate = DateTime.Today + TimeSpan.FromDays(1)},
+        new CalorieEntry {Name = "Chipotle", Calories = 770, Protien = 4,  EntryDate = DateTime.Today},
+        new CalorieEntry {Name = "Cliff Bar", Calories = 280, Protien = 5, EntryDate = DateTime.Now},
+        new CalorieEntry {Name = "Fuel Wrap", Calories = 650, Protien = 6, EntryDate = DateTime.Now},
+        new CalorieEntry {Name = "Cliff Bar", Calories = 280, Protien = 5, EntryDate = DateTime.Today - TimeSpan.FromDays(1)},
+        new CalorieEntry {Name = "Fuel Wrap", Calories = 650, Protien = 6, EntryDate = DateTime.Today - TimeSpan.FromDays(3)},
       };
 
       meals = new SavedMeal[] {
@@ -40,16 +45,7 @@ namespace BusinessLayer.Tests
         new SavedMeal { MealName = "Fuel Wrap", Calories = 650, Protien = 6},
       };
 
-      mealEntries = new MealEntry[] {
-        new MealEntry {MealForEntry = meals[1], EntryDate = DateTime.Today + TimeSpan.FromDays(1)},
-        new MealEntry {MealForEntry = meals[0], EntryDate = DateTime.Today},
-        new MealEntry {MealForEntry = meals[1], EntryDate = DateTime.Now},
-        new MealEntry {MealForEntry = meals[2], EntryDate = DateTime.Now},
-        new MealEntry {MealForEntry = meals[1], EntryDate = DateTime.Today - TimeSpan.FromDays(1)},
-        new MealEntry {MealForEntry = meals[2], EntryDate = DateTime.Today - TimeSpan.FromDays(3)},
-      };
-
-      inMemoryDb = Common.CreateInMemoryDatabase("Calorie Log Database",foods:foods, meals: meals, mealEntries: mealEntries, foodEntries: foodEntries);
+      inMemoryDb = Common.CreateInMemoryDatabase("Calorie Log Database",foods:foods, meals: meals, calorieEntries: calorieEntries);
       sut = new CalorieLog(inMemoryDb);
     }
 
@@ -138,13 +134,9 @@ namespace BusinessLayer.Tests
     [Test]
     public void AddRemoveEntries_Successful()
     {
-      foreach (var f in foodEntries)
+      foreach (var c in calorieEntries)
       {
-        sut.RemoveFoodEntry(f.Id);
-      }
-      foreach (var m in mealEntries)
-      {
-        sut.RemoveMealEntry(m.Id);
+        sut.RemoveCalorieEntry(c.Id);
       }
       var currentEntries = sut.GetEntries(DateTime.Today);
       CollectionAssert.IsEmpty(currentEntries);
@@ -156,8 +148,7 @@ namespace BusinessLayer.Tests
     }
     [Test]
     public void Remove_Fails_With_Invalid_Ids() {
-      Assert.Throws<ArgumentException>(() => sut.RemoveFoodEntry(1234), "No FoodEntry exists with id 1234");
-      Assert.Throws<ArgumentException>(() => sut.RemoveMealEntry(1234), "No MealEntry exists with id 1234");
+      Assert.Throws<ArgumentException>(() => sut.RemoveCalorieEntry(1234), "No FoodEntry exists with id 1234");
     }
   }
 }

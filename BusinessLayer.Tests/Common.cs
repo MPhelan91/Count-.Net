@@ -8,7 +8,7 @@ namespace BusinessLayer.Tests
 {
   public static class Common
   {
-    public static DatabaseContext CreateInMemoryDatabase(string name, ICollection<SavedFood> foods = null, ICollection<SavedMeal> meals = null, ICollection<FoodEntry> foodEntries = null, ICollection<MealEntry> mealEntries = null) {
+    public static DatabaseContext CreateInMemoryDatabase(string name, ICollection<SavedFood> foods = null, ICollection<SavedMeal> meals = null, ICollection<CalorieEntry> calorieEntries = null) {
       //Create in memory db
       var options = new DbContextOptionsBuilder<DatabaseContext>()
           .UseInMemoryDatabase(databaseName: name)
@@ -23,8 +23,7 @@ namespace BusinessLayer.Tests
       if(meals != null) inMemoryDb.SavedMeals.AddRange(meals);
       inMemoryDb.SaveChanges();
 
-      if(foodEntries != null) inMemoryDb.FoodEntries.AddRange(foodEntries);
-      if(mealEntries != null) inMemoryDb.MealEntries.AddRange(mealEntries);
+      if(calorieEntries != null) inMemoryDb.CalorieEntries.AddRange(calorieEntries);
       inMemoryDb.SaveChanges();
 
       return inMemoryDb;

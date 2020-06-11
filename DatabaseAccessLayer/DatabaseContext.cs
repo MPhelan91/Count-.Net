@@ -14,8 +14,7 @@ namespace DatabaseAccessLayer
       _connectionString = connectionString;
     }
     
-    public DbSet<MealEntry> MealEntries { get; set; }
-    public DbSet<FoodEntry> FoodEntries { get; set; }
+    public DbSet<CalorieEntry> CalorieEntries { get; set; }
     public DbSet<SavedFood> SavedFoods { get; set; }
     public DbSet<SavedMeal> SavedMeals { get; set; }
     public DbSet<User> Users { get; set; }

@@ -4,19 +4,11 @@ using System.Text;
 
 namespace DatabaseAccessLayer
 {
-  public class FoodEntry
-  {
+  public class CalorieEntry {
     public int Id { get; set; }
+    public string Name { get; set; }
     public DateTime EntryDate { get; set; }
-    public SavedFood FoodForEntry { get; set; }
     public double Calories { get; set; }
     public double Protien { get; set; }
-  }
-
-  public class MealEntry
-  {
-    public int Id { get; set; }
-    public DateTime EntryDate { get; set; }
-    public SavedMeal MealForEntry { get; set; }
   }
 }
