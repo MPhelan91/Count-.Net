@@ -16,7 +16,7 @@ namespace CountApi.Controllers
     private CountDictionary _dictionary;
     public FoodDictionaryController()
     {
-      var dbContext = new DatabaseContext(@"Data Source=.\SQLExpress;User Id=CountUser;Password=Count12345;Initial Catalog=Count_001_DB;");
+      var dbContext = new DatabaseContext(@"Data Source=.\SQLExpress;User Id=CountUser;Password=Count1234;Initial Catalog=Count_001_DB;");
       _dictionary = new CountDictionary(dbContext);
     }
     // GET: api/FoodDictionary

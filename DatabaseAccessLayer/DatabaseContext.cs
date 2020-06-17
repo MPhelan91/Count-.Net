@@ -7,7 +7,7 @@ namespace DatabaseAccessLayer
 {
   public class DatabaseContext : DbContext 
   {
-    private string _connectionString;//= @"Data Source=.\SQLExpress;User Id=CountUser;Password=Count12345;Initial Catalog=Count_001_DB;";
+    private string _connectionString;//= @"Data Source=.\SQLExpress;User Id=CountUser;Password=Count1234;Initial Catalog=Count_001_DB;";
     public DatabaseContext() { }
     public DatabaseContext(DbContextOptions<DatabaseContext> options): base(options) { }
     public DatabaseContext(string connectionString) {

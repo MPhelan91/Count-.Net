@@ -19,7 +19,7 @@ namespace CountApi.Controllers
     private CalorieLog _log;
     public CalorieLogController()
     {
-      var dbContext = new DatabaseContext(@"Data Source=.\SQLExpress;User Id=CountUser;Password=Count12345;Initial Catalog=Count_001_DB;");
+      var dbContext = new DatabaseContext(@"Data Source=.\SQLExpress;User Id=CountUser;Password=Count1234;Initial Catalog=Count_001_DB;");
       _log = new CalorieLog(dbContext);
     }
 

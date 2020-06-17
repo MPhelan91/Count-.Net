@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/CalorieLog/getEntries",
+      "launchUrl": "api/FoodDictionary",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

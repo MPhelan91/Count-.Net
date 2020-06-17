@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BusinessLayer;
+using CountApi.Messages;
 using DatabaseAccessLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ namespace CountApi.Controllers
     private CountDictionary _dictionary;
 
     public MealDictionaryController() {
-      var dbContext = new DatabaseContext(@"Data Source=.\SQLExpress;User Id=CountUser;Password=Count12345;Initial Catalog=Count_001_DB;");
+      var dbContext = new DatabaseContext(@"Data Source=.\SQLExpress;User Id=CountUser;Password=Count1234;Initial Catalog=Count_001_DB;");
       _dictionary = new CountDictionary(dbContext);
     }
 
@@ -32,6 +33,13 @@ namespace CountApi.Controllers
     public IActionResult Post([FromBody] SavedMeal value)
     {
       return tryCatchServiceCall(() =>_dictionary.AddMeal(value));
+    }
+
+    [Route("mealFromEntries")]
+    [HttpPost]
+    public IActionResult PostManualEntry([FromBody] MealFromEntryPosting posting )
+    {
+      return tryCatchServiceCall(() => _dictionary.CreateMealFromLogEntries(posting.MealName, posting.EntryIds)); 
     }
 
     // PUT: api/MealDictionary/5

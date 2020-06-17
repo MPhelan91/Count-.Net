@@ -4,6 +4,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System;
+using System.Runtime.InteropServices.ComTypes;
+using Common;
 
 namespace BusinessLayer
 {
@@ -11,6 +13,14 @@ namespace BusinessLayer
     private DatabaseContext _context;
     public CountDictionary(DatabaseContext context){
       _context = context;
+    }
+    public void CreateMealFromLogEntries(string mealName, int[] entryIds) {
+      var entrySums = (from entries in _context.CalorieEntries
+                      where entryIds.Contains(entries.Id)
+                      group entries by 1 into g
+                      select new NutritionalInfo(g.Sum(x => x.Calories), g.Sum(x=> x.Protien))).FirstOrDefault();
+
+      AddMeal(new SavedMeal { MealName = mealName, Calories = entrySums.Calories, Protien = entrySums.Protien });
     }
     public IList<SavedFood> GetFoods() {
       return _context.SavedFoods.ToList();
